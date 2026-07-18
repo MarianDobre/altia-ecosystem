@@ -111,23 +111,26 @@ tenancy rămâne locală per produs, legată prin `oidc_sub`; S2S rămâne pe AP
   - Se elimină stocarea `companeroToken`/`companeroRefreshToken` din tabela User.
   - Tranzitoriu (până la A5): apelurile spre Companero se fac cu API key de serviciu, server-side.
   - Linking useri beta pe email la primul login cu Companero ID.
-- [ ] **A4. CRM pe Zitadel upstream** — provider OIDC generic în better-auth,
-  „Sign in with Companero ID" lângă email+parolă, linking pe email.
-  - Tot aici: **corectarea `docs/ARCHITECTURE.md` §10.2 + Decision Log** din CRM
-    (înlocuit „Companero ca IdP" cu decizia Zitadel — referință: ADR-001 de aici).
+- [x] **A4. CRM pe Companero ID** — **COD COMPLET 2026-07-18** ✅ (agent Opus, comis
+  `f56c7d9` + push): genericOAuth PKCE opt-in pe `COMPANERO_ID_*` (nesetate ⇒ identic cu
+  azi), linking pe email DOAR cu email local verificat (gardă anti-takeover verificată în
+  sursa better-auth), buton pe login/signup cu flag server-side request-time, docs
+  ARCHITECTURE §10.1–10.2 corectate (planul „Companero ca IdP" SUPERSEDED → ADR-001).
+  Loop verde: typecheck/lint/test 40-40/build/e2e 6-6. **Rămas la deploy-ul CRM:** client
+  OIDC per mediu (redirect `${BETTER_AUTH_URL}/api/auth/oauth2/callback/companero-id`)
+  + env-urile în Dokploy.
 - [ ] **A5. Companero core ca relying party** (legacy touch, chirurgical; „când va fi cazul")
   - Symfony OIDC access-token handler: `/api/v1` acceptă și JWT Zitadel (JWKS), în paralel cu Lexik.
   - Buton „Intră cu Companero ID" pe web; linking pe email verificat + stamp `oidc_sub` pe `app_user`.
   - Lexik/parola locală rămân funcționale — sunset natural.
 - [ ] **A6. Mobile Companero pe OIDC** — `expo-auth-session` în locul `/api/token`.
   Layer-ul e izolat (un singur punct de injectare Bearer în `src/api/client.ts`). Depinde de A5.
-- [~] **A7. Datero — federare blândă** — **COD IMPLEMENTAT 2026-07-18** (agent Opus,
-  NECOMIS în repo — Datero e live cu autodeploy): plugin genericOAuth condiționat de 3
-  env-uri opționale (`COMPANERO_ID_*`), `GET /v1/auth/config` pt UI, buton pe login.astro,
-  linking pe email (trustedProviders), anti-abuz magic-link intact, teste 45/45.
-  **Activare (când decide Marian):** review + commit/push în datero → client OIDC WEB pe
-  id.companero.ro cu redirect `https://api.datero.ro/api/auth/oauth2/callback/companero`
-  (prin PAT, ca la A2) → env-urile în Dokploy (serviciul Api).
+- [x] **A7. Datero — federare blândă** — **LIVE PE PROD 2026-07-18** ✅ (aprobat de
+  Marian): cod agent Opus (genericOAuth opt-in pe `COMPANERO_ID_*`, `GET /v1/auth/config`,
+  buton login.astro, linking pe email verificat, magic-link/Stripe neatinse, teste 45/45)
+  comis `bbee3bb` + autodeploy; client OIDC `datero-web-login` pe id.companero.ro (proiect
+  `datero`, auth POST, redirect api.datero.ro/api/auth/oauth2/callback/companero); env în
+  Dokploy pe datero-api. VERIFICAT: /v1/auth/config → enabled:true, butonul pe /login.
 
 Ordine obligatorie: A1 → (A2, A3, A4, A7); A5 → A6. A3 are deadline natural (App Store).
 
