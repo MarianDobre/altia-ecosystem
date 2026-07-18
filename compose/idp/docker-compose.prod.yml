@@ -11,7 +11,9 @@ services:
     image: ghcr.io/zitadel/zitadel:${ZITADEL_VERSION}
     restart: unless-stopped
     # TLS terminat de Traefik (Dokploy) + Cloudflare; Zitadel vorbește HTTP intern.
-    command: start-from-init --tlsMode external
+    # --masterkeyFromEnv e OBLIGATORIU: fără el, Zitadel NU citește ZITADEL_MASTERKEY
+    # din environment (crash-loop „no master key provided" — pățit la primul deploy).
+    command: start-from-init --masterkeyFromEnv --tlsMode external
     environment:
       # Cheia de criptare a instanței — generată o dată (exact 32 caractere):
       #   openssl rand -hex 16
