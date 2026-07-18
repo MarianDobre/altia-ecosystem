@@ -103,8 +103,21 @@ Ordine obligatorie: A1 → (A2, A3, A4, A7); A5 → A6. A3 are deadline natural 
   `docs/golden-path.md`, `docs/port-registry.md`, `docs/medii-zitadel.md`, `justfile`
   (inclusiv `idp-up` pentru Zitadel local — deleghează la compose-ul Facturare, vezi
   `docs/medii-zitadel.md` § Local).
-- [ ] **B2. Dockerfile-uri lipsă** — CRM și Facturare (api/web/worker), după template-ul
-  Datero (multi-stage node:22-alpine, non-root, healthcheck `/health`).
+- [x] **B2. Dockerfile-uri producție CRM + Facturare** — **FĂCUT 2026-07-18** (2 agenți
+  Opus, ambele verificate cu docker build + boot local; fișierele NECOMISE în repo-urile
+  de produs — Marian le comite la primul deploy):
+  - **CRM**: `Dockerfile` multi-stage standalone (241 MB) + `.dockerignore` + rută nouă
+    `app/api/health/route.ts` + `output:'standalone'` în next.config.ts. Env dummy DOAR
+    în stage-ul de build (Zod runtime intact). Migrații = pas de deploy (`pnpm db:migrate`
+    cu DSN owner), documentat în header.
+  - **Facturare**: UN `Dockerfile` la rădăcină cu 3 targets `api`/`web`/`worker`
+    (212/238/175 MB) + `.dockerignore` (exclude .env* și infra/.zitadel!) +
+    `outputFileTracingRoot` în apps/web/next.config.mjs. `pnpm deploy --legacy` per app;
+    migrațiile Drizzle rulabile din imaginea api: `node dist/db/migrate.js` cu
+    `MIGRATION_DATABASE_URL` (owner) — în Dokploy ca Pre-deploy command. Worker fără
+    HEALTHCHECK HTTP (intenționat, consumator BullMQ).
+  - Repo-uri GitHub create de Marian + push-uite: `MarianDobre/facturare`,
+    `/companero-mobile`, `/altia-ecosystem` (toate legate din local).
 - [ ] **B3. Observabilitate comună** — uptime-kuma pe Dokploy (toate `/health`-urile,
   alerte în Slack-ul existent Companero) + Sentry (DSN per proiect; întâi Bizigniter + Facturare).
 - [ ] **B4. Backups standard — TOATE proiectele Dokploy** (cerut explicit de Marian
