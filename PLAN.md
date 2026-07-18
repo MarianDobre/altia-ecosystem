@@ -65,8 +65,16 @@ tenancy rămâne locală per produs, legată prin `oidc_sub`; S2S rămâne pe AP
     (2026-07-18, verificat cu email real, sender „Companero ID (test)").
   - Backup R2 pe `zitadel-db` (staging): de configurat din tab Backups (mai puțin
     critic decât prod, dar ieftin).
-- [ ] **A2. Facturare pe Zitadel prod/staging** — repointare env (`ZITADEL_*`).
-  Depinde de: A1 (sau A1b), B2-facturare (Dockerfile). Implementarea BFF PKCE există deja.
+- [x] **A2. Facturare pe Companero ID (prod)** — **FĂCUT + VERIFICAT 2026-07-18** ✅
+  - Provisioning pe id.companero.ro cu PAT (pattern zitadel-bootstrap.sh): proiect Zitadel
+    `facturare` (382322592658227202), app WEB PKCE `facturare-web` (client_id
+    382322592926728194, redirect https://facturare.companero.ro/auth/callback) + app API
+    basic `facturare-api` (introspecție MCP). Env-uri injectate în Dokploy, web+api
+    redeployate.
+  - Verificat: `/auth/login` → 307 către id.companero.ro/oauth/v2/authorize cu PKCE S256.
+    Login end-to-end de testat de Marian (JIT provisioning la primul login).
+  - Staging (facturare.test.companero.ro): la deploy-ul de staging — client separat pe
+    id.test.companero.ro, același script.
   - **Groundwork Dokploy FĂCUT (2026-07-18, prin API):** proiecte prod `Companero.facturare`
     (postgres:17 `facturare-db` + `facturare-redis`) și `Companero.crm` (postgres:17 `crm-db`),
     toate deployate. Parolele DB: în Dokploy UI (serviciile Database). DNS Cloudflare
@@ -135,8 +143,12 @@ Ordine obligatorie: A1 → (A2, A3, A4, A7); A5 → A6. A3 are deadline natural 
     HEALTHCHECK HTTP (intenționat, consumator BullMQ).
   - Repo-uri GitHub create de Marian + push-uite: `MarianDobre/facturare`,
     `/companero-mobile`, `/altia-ecosystem` (toate legate din local).
-- [ ] **B3. Observabilitate comună** — uptime-kuma pe Dokploy (toate `/health`-urile,
-  alerte în Slack-ul existent Companero) + Sentry (DSN per proiect; întâi Bizigniter + Facturare).
+- [~] **B3. Observabilitate comună** — **uptime-kuma DEPLOYAT 2026-07-18** (proiect
+  Dokploy `Monitoring`, imagine louislam/uptime-kuma:1, volum persistent,
+  **https://status.companero.ro**). ⚠️ RĂMAS: (1) Marian își creează contul admin la
+  prima accesare (pagina de setup e publică până atunci — fă-o repede!); (2) adăugarea
+  monitoarelor (/health-urile: facturare web+api via domeniu, datero, bizigniter, id +
+  id.test /debug/healthz, companero.ro) + notificare Slack; (3) Sentry (DSN per proiect).
 - [ ] **B4. Backups standard — TOATE proiectele Dokploy** (cerut explicit de Marian
   2026-07-18, „nu am timp acum" — de programat o sesiune dedicată). Preferabil prin
   tab-ul Backups al serviciilor Database Dokploy (S3→R2, nativ) unde există serviciu
@@ -155,8 +167,9 @@ Ordine obligatorie: A1 → (A2, A3, A4, A7); A5 → A6. A3 are deadline natural 
   în CLAUDE.md-ul fiecărui repo cu tabelul căilor + regula „citește CONTEXT.md-ul vecinului".
 - [x] **C2. `AGENTS.md` peste tot** (2026-07-18) — symlink către CLAUDE.md în toate
   repo-urile (Codex citește AGENTS.md). companero-ai a primit și un CLAUDE.md nou (nu avea).
-- [ ] **C3. `permissions.additionalDirectories`** în `.claude/settings.local.json` per repo,
-  către siblings-ii atinși frecvent. Se face incremental, când se lucrează în fiecare repo.
+- [x] **C3. `permissions.additionalDirectories`** — FĂCUT 2026-07-18: `ecosystem` adăugat
+  în settings.local.json la toate cele 6 repo-uri (+ companero-ai la bizigniter, core la
+  mobile).
 - [ ] **C4. SDK Companero generat** (post-lansare) — publicare `/api/v1/openapi.json` stabil
   în core + pachet `@companero/api-client` (GitHub Packages); înlocuiește treptat cei 4
   clienți scriși de mână (CRM `lib/companero/client.ts`, Facturare `company-lookup.service.ts`,
