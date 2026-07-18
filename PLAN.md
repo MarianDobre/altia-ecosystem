@@ -93,6 +93,11 @@ tenancy rămâne locală per produs, legată prin `oidc_sub`; S2S rămâne pe AP
     ZITADEL_CLIENT_ID gol până la A2).
     - Bugfix găsit la deploy: worker-ul arunca user/parola din REDIS_URL → NOAUTH pe prod
       (fix comis `3fda0a8` în repo-ul facturare).
+    - Bugfix #2 (post-A2, găsit la primul login real): rewrites-ul Next `/backend/*` se
+      evaluează LA BUILD cu output standalone → proxy înghețat pe localhost:3001
+      (ECONNREFUSED pe orice apel API din browser; login-ul părea „nu face nimic").
+      Fix `f2489df`: route handler runtime `app/backend/[...path]/route.ts` care citește
+      `API_PROXY_URL` per-request. Verificat: /backend/health → {"status":"ok","db":"up"}.
     - GitHub: Marian a creat câte o aplicație Dokploy per repo (`Dokploy-companero-*`);
       aplicațiile din Dokploy au fost repoint-ate pe providerul `Dokploy-companero-facturare`.
     - Capcane API Dokploy: `application.saveEnvironment` cere și `buildArgs`/`buildSecrets`/
@@ -116,8 +121,13 @@ tenancy rămâne locală per produs, legată prin `oidc_sub`; S2S rămâne pe AP
   - Lexik/parola locală rămân funcționale — sunset natural.
 - [ ] **A6. Mobile Companero pe OIDC** — `expo-auth-session` în locul `/api/token`.
   Layer-ul e izolat (un singur punct de injectare Bearer în `src/api/client.ts`). Depinde de A5.
-- [ ] **A7. Datero — federare blândă** — provider OIDC upstream în better-auth,
-  linking pe email; magic-link + Stripe neatinse. Depinde doar de A1.
+- [~] **A7. Datero — federare blândă** — **COD IMPLEMENTAT 2026-07-18** (agent Opus,
+  NECOMIS în repo — Datero e live cu autodeploy): plugin genericOAuth condiționat de 3
+  env-uri opționale (`COMPANERO_ID_*`), `GET /v1/auth/config` pt UI, buton pe login.astro,
+  linking pe email (trustedProviders), anti-abuz magic-link intact, teste 45/45.
+  **Activare (când decide Marian):** review + commit/push în datero → client OIDC WEB pe
+  id.companero.ro cu redirect `https://api.datero.ro/api/auth/oauth2/callback/companero`
+  (prin PAT, ca la A2) → env-urile în Dokploy (serviciul Api).
 
 Ordine obligatorie: A1 → (A2, A3, A4, A7); A5 → A6. A3 are deadline natural (App Store).
 
