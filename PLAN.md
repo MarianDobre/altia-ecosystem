@@ -35,12 +35,12 @@ tenancy rămâne locală per produs, legată prin `oidc_sub`; S2S rămâne pe AP
 
 ## Flux A — Identitate (Zitadel)
 
-- [ ] **A1. Zitadel prod pe Dokploy** (`id.companero.ro`)
-  - Stack Dokploy nou pe Hetzner (88.99.96.16): Zitadel + PG17 dedicat.
-  - DNS Cloudflare `id.companero.ro` (proxied, Full strict), SMTP Zoho pt mailuri cont.
-  - Backup nightly pgdump→R2 **din prima zi** (vezi B4).
-  - Bootstrap refolosind `companero.facturare/scripts/zitadel-bootstrap.sh` (idempotent).
-  - Branding „Companero ID" (logo, culori) în consola Zitadel.
+- [ ] **A1. Zitadel prod pe Dokploy** (`id.companero.ro`) — **ÎN LUCRU (2026-07-18)**
+  - Runbook complet + compose versionat: **`compose/idp/README.md`** +
+    `compose/idp/docker-compose.prod.yml` (Zitadel = imagine de raft, fără repo/Dockerfile
+    propriu; PG = serviciu Database Dokploy cu backup R2 din UI → acoperă și B4 pt Zitadel).
+  - Rămas de executat în Dokploy UI + Cloudflare: pașii 1–6 din runbook.
+  - Branding „Companero ID", SMTP Zoho, MFA admin: pasul 5 din runbook.
   - Detalii medii + pattern-ul BROWSER_URL/INTERNAL_URL: `docs/medii-zitadel.md`.
 - [ ] **A1b. Zitadel staging** (`id.test.companero.ro`) — instanță separată de prod,
   proiect Dokploy propriu, poate sta după Cloudflare Access ca test.companero.ro
