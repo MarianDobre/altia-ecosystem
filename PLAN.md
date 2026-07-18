@@ -45,8 +45,7 @@ tenancy rămâne locală per produs, legată prin `oidc_sub`; S2S rămâne pe AP
   - Login + parolă nouă + MFA făcute de Marian ✔. **SMTP Brevo funcțional** (2026-07-18,
     verificat cu email real; capcanele 9–11 în runbook — Hetzner blochează 465, semantica
     `tls`, bug-ul endpoint-ului de password). Register public OFF pe AMBELE instanțe (2026-07-18, via API) ✔.
-    Rămas: branding „Companero ID" (consolă) + **rotația PAT-ului provisioner** (a ajuns într-un transcript
-    local — vezi nota din runbook).
+    Rămas: branding „Companero ID" (consolă) + ~~rotația PAT-ului provisioner~~ FĂCUTĂ 2026-07-18 (vechiul PAT revocat).
   - **Rămas ops:** verificat/configurat backup-ul R2 al serviciului `zitadel-db` din
     tab-ul Backups (pasul 2 din runbook); Cloudflare zonă → Full (strict) acum că
     originul are cert valid.

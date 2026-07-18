@@ -121,10 +121,10 @@ Verificarea reală (nu butonul Test, care poate minți): declanșezi
 `POST /v2/users/{id}/password_reset` și urmărești `docker logs` — absența
 `could not connect to smtp` = mail plecat.
 
-⚠️ **PAT rotation TODO**: PAT-ul provisionerului de PROD a ajuns accidental într-un
-transcript local de terminal (2026-07-18, paste rupt). Risc scăzut (doar mașina lui
-Marian), dar la următoarea sesiune: creează PAT nou pentru provisioner din consolă,
-înlocuiește `/machinekey/pat.txt` în volum, revocă-l pe cel vechi.
+✅ **PAT rotation FĂCUTĂ (2026-07-18, aceeași zi)**: PAT-ul scurs în transcriptul local
+a fost înlocuit (PAT nou creat prin mgmt API, scris în `/machinekey/pat.txt`, verificat)
+și cel vechi REVOCAT (`DELETE /management/v1/users/{uid}/pats/{id}` — listarea PAT-urilor
+e `POST .../pats/_search`, nu GET). Provisionerul are un singur PAT activ.
 
 ## Note operaționale
 - **Upgrade Zitadel** = schimbi `ZITADEL_VERSION` (citind release notes — rulează migrări
