@@ -74,8 +74,25 @@ tenancy rămâne locală per produs, legată prin `oidc_sub`; S2S rămâne pe AP
   - **Blocat pe Marian:** repo-uri GitHub pentru `companero.facturare`, `companero-mobile`,
     `ecosystem` (recomandat: MarianDobre/companero-facturare, /companero-mobile,
     /altia-ecosystem, private) — apoi push + legarea aplicațiilor în Dokploy din GitHub.
-  - La setup-ul PG Facturare: rulat `infra/postgres/init-db.sql` (cele 3 roluri RLS) pe
-    `facturare-db` înainte de primele migrații.
+  - **Facturare DEPLOYAT pe prod Dokploy (2026-07-18)** — 4 servicii live în proiectul
+    `Companero.facturare`: `facturare-gotenberg` (imagine gotenberg:8), `facturare-api`
+    (:3001, intern), `facturare-web` (**https://facturare.companero.ro → 200**, LE),
+    `facturare-worker` — toate build-uite din GitHub `MarianDobre/facturare` cu
+    `dockerBuildStage` pe Dockerfile-ul unic (autodeploy ON). Roluri RLS create pe
+    `facturare-db` (facturare_app NOBYPASSRLS / facturare_maintenance BYPASSRLS, parole
+    generate; owner=userul Dokploy `facturare`); migrații 0000–0007 aplicate one-off cu
+    `docker exec … node dist/db/migrate.js`. Env complet (DSN-uri, Redis cu parolă, SMTP
+    Brevo, GOTENBERG_URL, ANAF_MOCK=1, PAYMENTS_MOCK=1, ZITADEL_* → id.companero.ro,
+    ZITADEL_CLIENT_ID gol până la A2).
+    - Bugfix găsit la deploy: worker-ul arunca user/parola din REDIS_URL → NOAUTH pe prod
+      (fix comis `3fda0a8` în repo-ul facturare).
+    - GitHub: Marian a creat câte o aplicație Dokploy per repo (`Dokploy-companero-*`);
+      aplicațiile din Dokploy au fost repoint-ate pe providerul `Dokploy-companero-facturare`.
+    - Capcane API Dokploy: `application.saveEnvironment` cere și `buildArgs`/`buildSecrets`/
+      `createEnvFile`; la Applications, tab-ul Domains FUNCȚIONEAZĂ (spre deosebire de
+      Compose Raw).
+    - Rămase pt A2/M2-real: client OIDC (bootstrap cu PAT), `S3_*` (bucket R2 — de la
+      Marian), `ANAF_*` real, Netopia real. Backup R2 pe facturare-db → B4.
 - [ ] **A3. Bizigniter pe OIDC nativ** — ⚠️ obligatoriu ÎNAINTE de submisia App Store.
   - `expo-auth-session` PKCE în `apps/mobile`; echivalent în `apps/web`.
   - API-ul validează JWT Zitadel (JWKS) în loc de JWT propriu emis din parola Companero.
