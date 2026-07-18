@@ -116,6 +116,11 @@ tenancy rămâne locală per produs, legată prin `oidc_sub`; S2S rămâne pe AP
   - Cheie de serviciu Companero emisă pe Netcup (`app:api-key:issue`, tier business,
     scope read, user marian) → `COMPANERO_API_KEY` în env bizigniter-api. `JWT_SECRET`/
     `JWT_EXPIRES_IN` scoase din env.
+  - Bugfix-uri post-deploy (găsite la testul lui Marian, ambele fixate+push-uite):
+    CSP-ul web bloca fetch-urile PKCE către issuer (`connect-src` fără id.companero.ro —
+    fix 8f6fa4c; regulă pt ORICE client PKCE viitor din ecosistem) și navigarea
+    client-side post-callback lăsa AuthProvider-ul pe starea veche → loader infinit pe
+    /discover (fix ad940c5: window.location.replace).
   - **Follow-up-uri**: (1) verificare `audience` în ZitadelAuthGuard (azi acceptă orice
     token al instanței — toți clienții sunt ai noștri, risc mic); (2) REVOCĂ cheia cmpk
     orfană `bizigniter-service` emisă prima (plaintext pierdut înainte de instalare —
