@@ -73,8 +73,13 @@ tenancy rămâne locală per produs, legată prin `oidc_sub`; S2S rămâne pe AP
     redeployate.
   - Verificat: `/auth/login` → 307 către id.companero.ro/oauth/v2/authorize cu PKCE S256.
     Login end-to-end de testat de Marian (JIT provisioning la primul login).
-  - Staging (facturare.test.companero.ro): la deploy-ul de staging — client separat pe
-    id.test.companero.ro, același script.
+  - **STAGING LIVE (2026-07-18, agent Opus)**: proiect Dokploy `Companero.facturare.test`
+    complet — PG+roluri RLS, Redis, Gotenberg, api/web/worker din același repo/branch
+    (autodeploy ON ⇒ staging-ul urmărește main-ul împreună cu prod-ul), migrații
+    aplicate, client OIDC pe id.test (web `382337404071117237` + introspecție),
+    domeniu `facturare.test.companero.ro` (LE pe DNS gri). Verificat: /backend/health
+    ok+db up, /auth/login → 307 spre id.test, worker fără erori. Secretele: în
+    scratchpad state local + Dokploy Environment.
   - **Groundwork Dokploy FĂCUT (2026-07-18, prin API):** proiecte prod `Companero.facturare`
     (postgres:17 `facturare-db` + `facturare-redis`) și `Companero.crm` (postgres:17 `crm-db`),
     toate deployate. Parolele DB: în Dokploy UI (serviciile Database). DNS Cloudflare
