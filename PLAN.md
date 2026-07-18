@@ -149,9 +149,20 @@ tenancy rămâne locală per produs, legată prin `oidc_sub`; S2S rămâne pe AP
     dokploy-network — pattern reutilizabil; runner-ul provizionează și rolul crm_app).
     Capcană notată: între deploy și migrații, SSO-ul dă „Autentificarea a eșuat"
     (better-auth fără tabele) — la orice mediu nou: migrațiile ÎNAINTE de primul login.
-- [ ] **A5. Companero core ca relying party** (legacy touch, chirurgical; „când va fi cazul")
-  - Symfony OIDC access-token handler: `/api/v1` acceptă și JWT Zitadel (JWKS), în paralel cu Lexik.
-  - Buton „Intră cu Companero ID" pe web; linking pe email verificat + stamp `oidc_sub` pe `app_user`.
+- [~] **A5. Companero core ca relying party** — **COD COMPLET 2026-07-18 (agent Opus +
+  review Fable), NECOMIS în repo-ul core, NEDEPLOYAT** (deploy = decizie Marian):
+  - Livrat: CompaneroIdController (PKCE web login, client confidențial), 
+    CompaneroIdTokenAuthenticator pe firewall-ul api (JWKS RS256 prin ext-openssl, FĂRĂ
+    dependințe noi; iss/exp/aud), provisioner fail-closed (linking DOAR pe email
+    verificat), migrare `app_user.oidc_sub` (nerulată), buton RO pe login (vizibil doar
+    cu env-urile setate), docs modules/auth + nod manual + manual:lint OK. Verificat:
+    lint container/twig, schema:validate, phpunit 4/4 (JWK→PEM byte-identic cu
+    openssl!), kernel smoke pe ambele rute. Review Fable pe extractor+security.yaml:
+    inert fără env-uri, Lexik/cmpk neatinse.
+  - **Activare (când decide Marian):** (1) client Zitadel WEB confidențial per mediu,
+    redirect EXACT `{APP_URL}/auth/companero-id/callback`; (2) pe proiectul Zitadel:
+    „Assert Access Token as JWT" (altfel calea API cere introspection — nu e în A5);
+    (3) env-urile `COMPANERO_ID_*` în deploy; (4) migrarea; (5) deploy Ansible manual.
   - Lexik/parola locală rămân funcționale — sunset natural.
 - [ ] **A6. Mobile Companero pe OIDC** — `expo-auth-session` în locul `/api/token`.
   Layer-ul e izolat (un singur punct de injectare Bearer în `src/api/client.ts`). Depinde de A5.
