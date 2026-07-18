@@ -99,6 +99,33 @@ inert aici; rutarea se face DOAR prin `traefik.*` labels scrise de noi în compo
 Dokploy înseamnă doar `docker compose up` reușit — starea reală se vede în
 `docker logs`, nu în UI.
 
+## SMTP (Brevo) — configurat pe ambele instanțe (2026-07-18), cu 3 capcane proprii
+
+Ambele instanțe trimit prin **Brevo** `smtp-relay.brevo.com:587`, user `afcdd4001@smtp-brevo.com`
+(aceleași credențiale ca `MAILER_DSN` prod din ansible), sender `contact@companero.ro`
+(domeniul e autentificat în Brevo — SPF/DKIM în DNS). Parolele Zoho din `.env.local` sunt
+MOARTE (liniile comentate). Capcane descoperite pe drum:
+
+9. **Hetzner blochează outbound 465** (implicit-TLS); 587 e deschis. Orice SMTP de pe
+   acest server = port 587. (Eroarea `EMAIL-sl39s could not contact using TLS` = 465 blocat.)
+10. **Semantica flag-ului `tls` în Zitadel e contraintuitivă** (verificat în sursă,
+   `channel.go`): `tls:false` = plaintext PUR, fără STARTTLS → providerii refuză AUTH;
+   `tls:true` = implicit-TLS cu **fallback automat pe STARTTLS** când serverul răspunde
+   plaintext. Deci pentru 587+STARTTLS setezi `tls: TRUE` (da, true!).
+11. **`PUT /admin/v1/smtp/{id}/password` răspunde 200 dar NU salvează parola** (Zitadel
+   v4.16.1) — simptom: `EMAIL-s9kfs (535 Authentication failed)` deși credențialele merg
+   perfect testate cu smtplib de pe același IP. Fix: DELETE config + POST nou **cu
+   `password` inclus în body la creare** + `_activate`. Nu folosi endpoint-ul de password.
+
+Verificarea reală (nu butonul Test, care poate minți): declanșezi
+`POST /v2/users/{id}/password_reset` și urmărești `docker logs` — absența
+`could not connect to smtp` = mail plecat.
+
+⚠️ **PAT rotation TODO**: PAT-ul provisionerului de PROD a ajuns accidental într-un
+transcript local de terminal (2026-07-18, paste rupt). Risc scăzut (doar mașina lui
+Marian), dar la următoarea sesiune: creează PAT nou pentru provisioner din consolă,
+înlocuiește `/machinekey/pat.txt` în volum, revocă-l pe cel vechi.
+
 ## Note operaționale
 - **Upgrade Zitadel** = schimbi `ZITADEL_VERSION` (citind release notes — rulează migrări
   de DB automat) → redeploy. Fă backup manual R2 înainte de upgrade-uri majore.

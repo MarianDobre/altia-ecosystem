@@ -42,9 +42,11 @@ tenancy rămâne locală per produs, legată prin `oidc_sub`; S2S rămâne pe AP
     (compose `zitadel` + DB `zitadel-db`/postgres:18).
   - Runbook + compose versionat: `compose/idp/` — include TOATE capcanele primului
     deploy (secțiunea „Capcanele primului deploy" din README — citește-o înainte de A1b!).
-  - **Rămas manual (Marian, pasul 5 din runbook):** primul login în consolă (parola
-    temporară = `ADMIN_PASSWORD` din Dokploy → zitadel → Environment; o schimbi la login)
-    + MFA + branding „Companero ID" + SMTP Zoho + register public off.
+  - Login + parolă nouă + MFA făcute de Marian ✔. **SMTP Brevo funcțional** (2026-07-18,
+    verificat cu email real; capcanele 9–11 în runbook — Hetzner blochează 465, semantica
+    `tls`, bug-ul endpoint-ului de password). Rămas: branding „Companero ID" + register
+    public off (consolă) + **rotația PAT-ului provisioner** (a ajuns într-un transcript
+    local — vezi nota din runbook).
   - **Rămas ops:** verificat/configurat backup-ul R2 al serviciului `zitadel-db` din
     tab-ul Backups (pasul 2 din runbook); Cloudflare zonă → Full (strict) acum că
     originul are cert valid.
@@ -59,8 +61,8 @@ tenancy rămâne locală per produs, legată prin `oidc_sub`; S2S rămâne pe AP
     2026-07-18 (healthz ok pe TLS strict, OIDC discovery, consolă 200). Notă operațională:
     după adăugarea DNS-ului a fost nevoie de un restart al containerului zitadel-test ca
     Traefik să re-declanșeze ACME (primul attempt căzuse pe NXDOMAIN pre-DNS).
-  - Admin staging: user `marian`, parola = `ADMIN_PASSWORD` din Dokploy →
-    Companero.test.id → zitadel → Environment (schimbare la primul login + MFA).
+  - Admin staging: login + parolă nouă făcute de Marian ✔. **SMTP Brevo funcțional**
+    (2026-07-18, verificat cu email real, sender „Companero ID (test)").
   - Backup R2 pe `zitadel-db` (staging): de configurat din tab Backups (mai puțin
     critic decât prod, dar ieftin).
 - [ ] **A2. Facturare pe Zitadel prod/staging** — repointare env (`ZITADEL_*`).
