@@ -53,6 +53,21 @@ services:
       - zitadel_machinekey:/machinekey
     networks:
       - dokploy-network
+    # Rutarea Traefik e declarată explicit aici (Dokploy nu injectează label-uri
+    # pentru serviciile Compose de tip Raw — constatat la primul deploy, 2026-07-18).
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=dokploy-network
+      - traefik.http.routers.companero-id.rule=Host(`id.companero.ro`)
+      - traefik.http.routers.companero-id.entrypoints=websecure
+      - traefik.http.routers.companero-id.tls=true
+      - traefik.http.routers.companero-id.tls.certresolver=letsencrypt
+      - traefik.http.routers.companero-id.service=companero-id
+      - traefik.http.services.companero-id.loadbalancer.server.port=8080
+      # și pe :80 (ACME/redirect prin Cloudflare)
+      - traefik.http.routers.companero-id-web.rule=Host(`id.companero.ro`)
+      - traefik.http.routers.companero-id-web.entrypoints=web
+      - traefik.http.routers.companero-id-web.service=companero-id
     healthcheck:
       test: ['CMD', '/app/zitadel', 'ready']
       interval: 15s
