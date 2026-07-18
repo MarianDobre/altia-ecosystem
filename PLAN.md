@@ -67,6 +67,15 @@ tenancy rămâne locală per produs, legată prin `oidc_sub`; S2S rămâne pe AP
     critic decât prod, dar ieftin).
 - [ ] **A2. Facturare pe Zitadel prod/staging** — repointare env (`ZITADEL_*`).
   Depinde de: A1 (sau A1b), B2-facturare (Dockerfile). Implementarea BFF PKCE există deja.
+  - **Groundwork Dokploy FĂCUT (2026-07-18, prin API):** proiecte prod `Companero.facturare`
+    (postgres:17 `facturare-db` + `facturare-redis`) și `Companero.crm` (postgres:17 `crm-db`),
+    toate deployate. Parolele DB: în Dokploy UI (serviciile Database). DNS Cloudflare
+    adăugat de Marian: `facturare`/`crm` (proxied) + `facturare.test`/`crm.test` (gri).
+  - **Blocat pe Marian:** repo-uri GitHub pentru `companero.facturare`, `companero-mobile`,
+    `ecosystem` (recomandat: MarianDobre/companero-facturare, /companero-mobile,
+    /altia-ecosystem, private) — apoi push + legarea aplicațiilor în Dokploy din GitHub.
+  - La setup-ul PG Facturare: rulat `infra/postgres/init-db.sql` (cele 3 roluri RLS) pe
+    `facturare-db` înainte de primele migrații.
 - [ ] **A3. Bizigniter pe OIDC nativ** — ⚠️ obligatoriu ÎNAINTE de submisia App Store.
   - `expo-auth-session` PKCE în `apps/mobile`; echivalent în `apps/web`.
   - API-ul validează JWT Zitadel (JWKS) în loc de JWT propriu emis din parola Companero.
