@@ -197,9 +197,10 @@ Ordine obligatorie: A1 → (A2, A3, A4, A7); A5 → A6. A3 are deadline natural 
     HEALTHCHECK HTTP (intenționat, consumator BullMQ).
   - Repo-uri GitHub create de Marian + push-uite: `MarianDobre/facturare`,
     `/companero-mobile`, `/altia-ecosystem` (toate legate din local).
-- [~] **B3. Observabilitate comună** — lista completă de monitoare + plan notificare
-  Slack: **`docs/monitoring.md`** (de executat în UI-ul uptime-kuma sau cu
-  uptime-kuma-api + credențialele lui Marian). Restul de la B3: — **uptime-kuma DEPLOYAT 2026-07-18** (proiect
+- [~] **B3. Observabilitate comună** — **monitoarele CONFIGURATE 2026-07-18**: 12/12 UP
+  pe status.companero.ro (uptime-kuma-api, script reutilizabil), notificare email Brevo
+  default pe toate. Detalii: `docs/monitoring.md`. RĂMAS: Sentry (așteaptă auth token +
+  org slug de la Marian — cont creat cu Google SSO) + opțional Slack webhook. Istoric: — **uptime-kuma DEPLOYAT 2026-07-18** (proiect
   Dokploy `Monitoring`, imagine louislam/uptime-kuma:1, volum persistent,
   **https://status.companero.ro**). ⚠️ RĂMAS: (1) Marian își creează contul admin la
   prima accesare (pagina de setup e publică până atunci — fă-o repede!); (2) adăugarea

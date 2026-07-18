@@ -1,11 +1,13 @@
 # Monitorizare — uptime-kuma (status.companero.ro)
 
-Instanța: proiect Dokploy `Monitoring`, `https://status.companero.ro` (cont admin: Marian).
-uptime-kuma nu are API REST oficial (config prin UI / socket.io) — lista de mai jos e
-sursa de adevăr pentru monitoarele de adăugat manual (sau printr-o sesiune viitoare cu
-`uptime-kuma-api` din python, cu credențialele lui Marian).
+Instanța: proiect Dokploy `Monitoring`, `https://status.companero.ro` (cont admin: Marian;
+credențiale local pe Mac în `~/.secrets/uptime-kuma`). **CONFIGURAT 2026-07-18 prin
+`uptime-kuma-api`** (venv + script în scratchpad-ul sesiunii; pattern reutilizabil):
+12 monitoare, toate UP la configurare, interval 60s, retry 2, notificare email
+**Brevo → marian.dobre@gmail.com** setată default pe toate (Slack: de adăugat când
+există un incoming webhook — bot-token-ul core nu e compatibil cu uptime-kuma).
 
-## Monitoare de adăugat (HTTP(s), keyword unde e notat, interval 60s)
+## Monitoarele configurate (live)
 
 | Nume | URL | Așteptat |
 |---|---|---|
@@ -20,7 +22,7 @@ sursa de adevăr pentru monitoarele de adăugat manual (sau printr-o sesiune vii
 | Datero web | `https://datero.ro/` | 200 |
 | Bizigniter api | `https://api.bizigniter.app/api/v1/health` | 200, keyword `ok` |
 | Bizigniter web | `https://bizigniter.app/login` | 200 |
-| companero-ai | `https://ai.companero.ro/healthz` | 200 (prin tunelul CF; dacă e gated, monitor intern) |
+| companero-ai (intern) | `http://companero-ai-engine-app-vtycag-api-1:8100/healthz` | 200 — prin dokploy-network; public dă 403 (WAF CF permite doar IP-ul Netcup) |
 | status (self) | — uptime-kuma se monitorizează greu singur; opțional monitor extern gratuit (healthchecks.io) | — |
 
 ## Notificare
@@ -31,7 +33,7 @@ sursa de adevăr pentru monitoarele de adăugat manual (sau printr-o sesiune vii
 
 ## De făcut (rămas din B3)
 
-- [ ] Adăugarea monitoarelor de mai sus (Marian în UI sau sesiune cu uptime-kuma-api).
-- [ ] Notificarea Slack (webhook-ul din config-ul core — vezi env-urile de pe Netcup).
+- [x] Monitoarele — CONFIGURATE 2026-07-18, 12/12 UP.
+- [x] Notificare — email Brevo default pe toate (Slack rămâne opțional, cere incoming webhook).
 - [ ] Sentry: cont + câte un DSN pentru Bizigniter, Facturare, CRM (SaaS free tier
       ajunge); env `SENTRY_DSN` per app + SDK-urile — sesiune separată.
