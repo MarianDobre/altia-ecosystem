@@ -55,10 +55,10 @@ tenancy rămâne locală per produs, legată prin `oidc_sub`; S2S rămâne pe AP
     (capcanele 1–8 pre-rezolvate; volum machinekey pre-creat cu permisiuni). loginV2
     dezactivat. Compose: `compose/idp/docker-compose.test.yml`. Masterkey: Dokploy
     Environment + copie `~/.secrets/zitadel-test-masterkey`.
-  - **Rămas (Marian)**: A record Cloudflare `id.test` → 88.99.96.16 **DNS only (gri!)**
-    — vezi corecția din `docs/medii-zitadel.md` (Universal SSL nu acoperă 2 niveluri;
-    fără Access aici). Certul LE se emite automat după apariția DNS-ului. Verificare:
-    `curl https://id.test.companero.ro/debug/healthz` → `ok`.
+  - DNS adăugat de Marian (A gri → 88.99.96.16), cert Let's Encrypt emis și VERIFICAT
+    2026-07-18 (healthz ok pe TLS strict, OIDC discovery, consolă 200). Notă operațională:
+    după adăugarea DNS-ului a fost nevoie de un restart al containerului zitadel-test ca
+    Traefik să re-declanșeze ACME (primul attempt căzuse pe NXDOMAIN pre-DNS).
   - Admin staging: user `marian`, parola = `ADMIN_PASSWORD` din Dokploy →
     Companero.test.id → zitadel → Environment (schimbare la primul login + MFA).
   - Backup R2 pe `zitadel-db` (staging): de configurat din tab Backups (mai puțin
