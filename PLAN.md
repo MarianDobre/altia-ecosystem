@@ -23,7 +23,8 @@ Deciziile de fond — **nu se re-deschid fără Marian**:
    Planul vechi „Companero ca IdP" din docs-urile CRM e abandonat (de corectat în CRM la A4).
 2. **Un singur „Companero ID"** — același cont peste tot, inclusiv Bizigniter și Datero.
 3. **Lansarea Companero (mobilpay) nu se blochează pe SSO.** Întâi infrastructura,
-   core-ul se mufează ulterior.
+   core-ul se mufează ulterior. (2026-07-18 seara: A5 în lucru COD-ONLY pe agent — nu se
+   deployează pe Netcup fără decizia lui Marian.)
 4. **Datero: federare blândă** — rămâne pe better-auth, se adaugă „Sign in with Companero ID"
    ca provider OIDC upstream, linking pe email. Conturile + Stripe neatinse.
 5. **Billing per-produs** — doar identitatea se centralizează, nu billingul.
@@ -121,12 +122,11 @@ tenancy rămâne locală per produs, legată prin `oidc_sub`; S2S rămâne pe AP
     fix 8f6fa4c; regulă pt ORICE client PKCE viitor din ecosistem) și navigarea
     client-side post-callback lăsa AuthProvider-ul pe starea veche → loader infinit pe
     /discover (fix ad940c5: window.location.replace).
-  - **Follow-up-uri**: (1) verificare `audience` în ZitadelAuthGuard (azi acceptă orice
-    token al instanței — toți clienții sunt ai noștri, risc mic); (2) REVOCĂ cheia cmpk
-    orfană `bizigniter-service` emisă prima (plaintext pierdut înainte de instalare —
-    două chei cu același nume există; de curățat pe Netcup); (3) test uman: login pe
-    bizigniter.app + build EAS pentru mobil; (4) tier `internal` pe cheie dacă beta
-    lovește rate-limit-ul business.
+  - Follow-up-uri închise (2026-07-18, runda 4): (1) ✅ verificare `audience` în guard
+    (env `COMPANERO_ID_AUDIENCES`, setat pe prod, commit 0bffacb); (2) ✅ cheia cmpk
+    orfană REVOCATĂ pe Netcup (`UPDATE api_key SET revoked_at` pe id-ul vechi; a rămas
+    doar 8b0ad722); rămase: (3) build EAS mobil (Marian); (4) tier `internal` pe cheie
+    doar dacă beta lovește limitele business.
 - [x] **A4. CRM pe Companero ID** — **COD COMPLET 2026-07-18** ✅ (agent Opus, comis
   `f56c7d9` + push): genericOAuth PKCE opt-in pe `COMPANERO_ID_*` (nesetate ⇒ identic cu
   azi), linking pe email DOAR cu email local verificat (gardă anti-takeover verificată în
@@ -180,7 +180,9 @@ Ordine obligatorie: A1 → (A2, A3, A4, A7); A5 → A6. A3 are deadline natural 
     HEALTHCHECK HTTP (intenționat, consumator BullMQ).
   - Repo-uri GitHub create de Marian + push-uite: `MarianDobre/facturare`,
     `/companero-mobile`, `/altia-ecosystem` (toate legate din local).
-- [~] **B3. Observabilitate comună** — **uptime-kuma DEPLOYAT 2026-07-18** (proiect
+- [~] **B3. Observabilitate comună** — lista completă de monitoare + plan notificare
+  Slack: **`docs/monitoring.md`** (de executat în UI-ul uptime-kuma sau cu
+  uptime-kuma-api + credențialele lui Marian). Restul de la B3: — **uptime-kuma DEPLOYAT 2026-07-18** (proiect
   Dokploy `Monitoring`, imagine louislam/uptime-kuma:1, volum persistent,
   **https://status.companero.ro**). ⚠️ RĂMAS: (1) Marian își creează contul admin la
   prima accesare (pagina de setup e publică până atunci — fă-o repede!); (2) adăugarea
