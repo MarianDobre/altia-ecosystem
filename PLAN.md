@@ -35,12 +35,19 @@ tenancy rămâne locală per produs, legată prin `oidc_sub`; S2S rămâne pe AP
 
 ## Flux A — Identitate (Zitadel)
 
-- [ ] **A1. Zitadel prod pe Dokploy** (`id.companero.ro`) — **ÎN LUCRU (2026-07-18)**
-  - Runbook complet + compose versionat: **`compose/idp/README.md`** +
-    `compose/idp/docker-compose.prod.yml` (Zitadel = imagine de raft, fără repo/Dockerfile
-    propriu; PG = serviciu Database Dokploy cu backup R2 din UI → acoperă și B4 pt Zitadel).
-  - Rămas de executat în Dokploy UI + Cloudflare: pașii 1–6 din runbook.
-  - Branding „Companero ID", SMTP Zoho, MFA admin: pasul 5 din runbook.
+- [x] **A1. Zitadel prod pe Dokploy** (`id.companero.ro`) — **LIVE 2026-07-18** ✅
+  - Verificat: healthz ok, cert Let's Encrypt real la origin, OIDC discovery
+    (issuer `https://id.companero.ro`), consolă 200, container healthy, PAT provisioner
+    scris în volumul machinekey. Zitadel v4.16.1, proiect Dokploy `companero-id`
+    (compose `zitadel` + DB `zitadel-db`/postgres:18).
+  - Runbook + compose versionat: `compose/idp/` — include TOATE capcanele primului
+    deploy (secțiunea „Capcanele primului deploy" din README — citește-o înainte de A1b!).
+  - **Rămas manual (Marian, pasul 5 din runbook):** primul login în consolă (parola
+    temporară = `ADMIN_PASSWORD` din Dokploy → zitadel → Environment; o schimbi la login)
+    + MFA + branding „Companero ID" + SMTP Zoho + register public off.
+  - **Rămas ops:** verificat/configurat backup-ul R2 al serviciului `zitadel-db` din
+    tab-ul Backups (pasul 2 din runbook); Cloudflare zonă → Full (strict) acum că
+    originul are cert valid.
   - Detalii medii + pattern-ul BROWSER_URL/INTERNAL_URL: `docs/medii-zitadel.md`.
 - [ ] **A1b. Zitadel staging** (`id.test.companero.ro`) — instanță separată de prod,
   proiect Dokploy propriu, poate sta după Cloudflare Access ca test.companero.ro
@@ -116,6 +123,14 @@ Ordine obligatorie: A1 → (A2, A3, A4, A7); A5 → A6. A3 are deadline natural 
    aici, dar **PLAN.md e sursa de adevăr**; la divergență, actualizează memoria, nu planul.
 
 ## Jurnalul de progres
+
+- **2026-07-18 (Fable, sesiunea 2) — A1 LIVE.** `id.companero.ro` funcțional cap-coadă
+  (Zitadel v4.16.1 pe Dokploy, DB dedicat, LE cert, OIDC discovery, PAT provisioner).
+  Debug în 7 pași — capcanele documentate în `compose/idp/README.md`. Unelte noi:
+  SSH server = `altia@88.99.96.16` (docker direct); API Dokploy funcțional cu token în
+  `~/.secrets/dokploy-token` (panel: `panel.altia.work`) — update compose/env + deploy
+  prin API merge complet. Rămase pe A1: pasul 5 manual (login/MFA/branding/SMTP) +
+  verificare backup R2 pe `zitadel-db` + CF Full (strict).
 
 - **2026-07-18 (Fable)** — Analiză completă a celor 7 proiecte (rapoarte de explorare pe
   stack/auth/deploy/integrare). Deciziile 1–5 confirmate de Marian. Constatări-cheie:

@@ -35,6 +35,11 @@ services:
 
       # Identitatea publică a instanței
       ZITADEL_EXTERNALSECURE: 'true'
+      # TLS oprit ÎN PROCES (Traefik+CF îl termină). Necesar și pentru healthcheck:
+      # probe-ul `zitadel ready` citește config-ul din env, nu flag-urile comenzii de
+      # start — fără asta probează HTTPS, pică mereu, containerul nu devine `healthy`
+      # și Traefik (docker provider) nu-l rutează deloc.
+      ZITADEL_TLS_ENABLED: 'false'
       ZITADEL_EXTERNALDOMAIN: id.companero.ro
       ZITADEL_EXTERNALPORT: '443'
 
@@ -50,7 +55,14 @@ services:
       ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_USERNAME: provisioner
       ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_NAME: Provisioner
       ZITADEL_FIRSTINSTANCE_PATPATH: /machinekey/pat.txt
-      ZITADEL_FIRSTINSTANCE_ORG_MACHINE_PAT_EXPIRATIONDATE: '2030-01-01T00:00:00Z'
+      # Prin env (${...}), NU literal: Dokploy re-serializează YAML-ul la deploy și
+      # transformă timestamp-urile ISO în format Go („2030-01-01 00:00:00 +0000 UTC"),
+      # pe care Zitadel nu-l parsează. Valoare în Environment: PAT_EXPIRATION=2030-01-01T00:00:00Z
+      ZITADEL_FIRSTINSTANCE_ORG_MACHINE_PAT_EXPIRATIONDATE: ${PAT_EXPIRATION}
+    # ⚠️ Volumul machinekey trebuie făcut writable pentru userul non-root `zitadel`
+    # ÎNAINTE de primul boot (Docker îl creează root-owned, iar scrierea pat.txt pică
+    # cu „permission denied" — și lasă instanța pe jumătate inițializată!):
+    #   docker run --rm -v <proiect>_zitadel_machinekey:/mk alpine chmod 0777 /mk
     volumes:
       - zitadel_machinekey:/machinekey
     networks:

@@ -59,6 +59,34 @@ cu diferența că serviciul aplicativ e imagine de raft, nu build din repo.
 - Bifează A1 în `PLAN.md` + intrare în jurnal + commit în repo-ul `ecosystem`.
 - Adaugă monitorizarea `https://id.companero.ro/debug/healthz` când există uptime-kuma (B3).
 
+## Capcanele primului deploy (2026-07-18) — TOATE rezolvate în compose-ul curent
+
+Șapte probleme înlănțuite până la primul boot reușit; le enumăr ca staging-ul (A1b) să
+iasă din prima. Compose-ul din acest director le are deja pe toate încorporate:
+
+1. **`ZITADEL_VERSION` gol** → imagine `zitadel:` invalidă. Pin explicit (ex. `v4.16.1`).
+2. **Serviciul DB necreat efectiv** — a fost definit în UI dar nepornit (Deploy pe
+   serviciul Database e pas separat). Simptom: `hostname resolving error` la boot.
+3. **`--masterkeyFromEnv` lipsă** — Zitadel NU citește `ZITADEL_MASTERKEY` din env fără
+   acest flag („no master key provided").
+4. **Dokploy strică timestamp-urile YAML** la re-serializare → PAT expiration prin
+   `${PAT_EXPIRATION}` din Environment, nu literal în YAML.
+5. **Volumul machinekey root-owned** → `open /machinekey/pat.txt: permission denied`,
+   care lasă instanța PE JUMĂTATE inițializată („Instance.Domain.AlreadyExists" la
+   fiecare restart). Fix: chmod/chown pe volum ÎNAINTE de primul boot; dacă s-a
+   întâmplat deja: `DROP DATABASE zitadel; CREATE DATABASE zitadel OWNER zitadel;` și boot curat.
+6. **Politica de parolă** pentru `ADMIN_PASSWORD`: minim 8, majusculă+minusculă+cifră+simbol
+   (și atenție la copy-paste în `ADMIN_EMAIL` — un `)` rătăcit a costat un ciclu).
+7. **Healthcheck-ul `zitadel ready` probează HTTPS** dacă TLS nu e oprit prin env
+   (`ZITADEL_TLS_ENABLED=false`) — flag-urile comenzii de start NU ajung la probe.
+   Container never-healthy = Traefik nu rutează (404 cu cert default).
+
+Plus: **Dokploy nu injectează label-uri Traefik pentru Compose Raw** — tab-ul Domains e
+inert aici; rutarea se face DOAR prin `traefik.*` labels scrise de noi în compose
+(provider-ul Docker e activ, `exposedByDefault: false`). Deploy-urile „Done/verzi" în
+Dokploy înseamnă doar `docker compose up` reușit — starea reală se vede în
+`docker logs`, nu în UI.
+
 ## Note operaționale
 - **Upgrade Zitadel** = schimbi `ZITADEL_VERSION` (citind release notes — rulează migrări
   de DB automat) → redeploy. Fă backup manual R2 înainte de upgrade-uri majore.
