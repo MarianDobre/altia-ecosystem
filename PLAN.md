@@ -159,7 +159,8 @@ tenancy rămâne locală per produs, legată prin `oidc_sub`; S2S rămâne pe AP
     lint container/twig, schema:validate, phpunit 4/4 (JWK→PEM byte-identic cu
     openssl!), kernel smoke pe ambele rute. Review Fable pe extractor+security.yaml:
     inert fără env-uri, Lexik/cmpk neatinse.
-  - **Activare (când decide Marian):** (1) client Zitadel WEB confidențial per mediu,
+  - **ÎN PROD din 2026-07-18, DEZACTIVAT** (env-urile goale; migrarea oidc_sub aplicată).
+  - **Activare (sesiune de design cu Marian):** (1) client Zitadel WEB confidențial per mediu,
     redirect EXACT `{APP_URL}/auth/companero-id/callback`; (2) pe proiectul Zitadel:
     „Assert Access Token as JWT" (altfel calea API cere introspection — nu e în A5);
     (3) env-urile `COMPANERO_ID_*` în deploy; (4) migrarea; (5) deploy Ansible manual.
@@ -247,6 +248,18 @@ Ordine obligatorie: A1 → (A2, A3, A4, A7); A5 → A6. A3 are deadline natural 
    aici, dar **PLAN.md e sursa de adevăr**; la divergență, actualizează memoria, nu planul.
 
 ## Jurnalul de progres
+
+- **2026-07-18 (Fable, runda 5) — A5 ÎN PROD (dezactivat) + incident scurt.** La cererea
+  lui Marian, A5 comis pe main (`fa432f0`) și deployat pe Netcup prin Ansible, cu
+  feature-ul stins (env-urile goale). **Incident ~15 min**: placeholder-ele goale din
+  .env au dat `base_uri=""` la scoped client → HttpClient arunca la construcția
+  authenticatorului → 500 pe TOT /api/v1 (web-ul neafectat); prins de smoke-ul automat
+  din deploy. Hotfix pe prod (.env.local cu URL-uri valide) → API restabilit instant;
+  permanentizat în core `.env` (`1c5f9c9`) + template-ul ansible (comis acolo).
+  Smoke final: 21/21 PASSED. Migrarea `oidc_sub` e aplicată pe prod. Lecții: (1)
+  placeholder-ele de env pentru URL-uri trebuie să fie valide, nu goale; (2)
+  verificarea locală pre-deploy trebuie să lovească și firewall-ul API, nu doar
+  paginile web. Activarea A5 = sesiune de design cu Marian (pașii în secțiunea A5).
 
 - **2026-07-18 (Fable, sesiunea 2b) — A1b DEPLOYAT integral prin API Dokploy** (proiect
   `Companero.test.id`, postgres + compose + deploy + loginV2 off), autonom, boot din
