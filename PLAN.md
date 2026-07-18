@@ -49,9 +49,20 @@ tenancy rămâne locală per produs, legată prin `oidc_sub`; S2S rămâne pe AP
     tab-ul Backups (pasul 2 din runbook); Cloudflare zonă → Full (strict) acum că
     originul are cert valid.
   - Detalii medii + pattern-ul BROWSER_URL/INTERNAL_URL: `docs/medii-zitadel.md`.
-- [ ] **A1b. Zitadel staging** (`id.test.companero.ro`) — instanță separată de prod,
-  proiect Dokploy propriu, poate sta după Cloudflare Access ca test.companero.ro
-  (backchannel-ul S2S merge pe rețeaua internă Docker, nu e afectat). Vezi `docs/medii-zitadel.md`.
+- [x] **A1b. Zitadel staging** (`id.test.companero.ro`) — **DEPLOYAT 2026-07-18** ✅
+  - Proiect Dokploy `Companero.test.id` (creat integral prin API): `zitadel-db`
+    (postgres:18) + compose `zitadel` (serviciu `zitadel-test`). Boot din PRIMA
+    (capcanele 1–8 pre-rezolvate; volum machinekey pre-creat cu permisiuni). loginV2
+    dezactivat. Compose: `compose/idp/docker-compose.test.yml`. Masterkey: Dokploy
+    Environment + copie `~/.secrets/zitadel-test-masterkey`.
+  - **Rămas (Marian)**: A record Cloudflare `id.test` → 88.99.96.16 **DNS only (gri!)**
+    — vezi corecția din `docs/medii-zitadel.md` (Universal SSL nu acoperă 2 niveluri;
+    fără Access aici). Certul LE se emite automat după apariția DNS-ului. Verificare:
+    `curl https://id.test.companero.ro/debug/healthz` → `ok`.
+  - Admin staging: user `marian`, parola = `ADMIN_PASSWORD` din Dokploy →
+    Companero.test.id → zitadel → Environment (schimbare la primul login + MFA).
+  - Backup R2 pe `zitadel-db` (staging): de configurat din tab Backups (mai puțin
+    critic decât prod, dar ieftin).
 - [ ] **A2. Facturare pe Zitadel prod/staging** — repointare env (`ZITADEL_*`).
   Depinde de: A1 (sau A1b), B2-facturare (Dockerfile). Implementarea BFF PKCE există deja.
 - [ ] **A3. Bizigniter pe OIDC nativ** — ⚠️ obligatoriu ÎNAINTE de submisia App Store.
@@ -123,6 +134,13 @@ Ordine obligatorie: A1 → (A2, A3, A4, A7); A5 → A6. A3 are deadline natural 
    aici, dar **PLAN.md e sursa de adevăr**; la divergență, actualizează memoria, nu planul.
 
 ## Jurnalul de progres
+
+- **2026-07-18 (Fable, sesiunea 2b) — A1b DEPLOYAT integral prin API Dokploy** (proiect
+  `Companero.test.id`, postgres + compose + deploy + loginV2 off), autonom, boot din
+  prima în ~20s. Corecție documentată în `docs/medii-zitadel.md`: `id.test.companero.ro`
+  = subdomeniu pe 2 niveluri → Universal SSL nu-l acoperă → DNS **gri** (fără Access pe
+  IdP-ul de staging). Rămas: Marian adaugă A-recordul gri → certul LE se emite singur.
+  Pe prod (A1): loginV2 dezactivat (capcana 8), Marian a făcut login + parolă nouă + MFA.
 
 - **2026-07-18 (Fable, sesiunea 2) — A1 LIVE.** `id.companero.ro` funcțional cap-coadă
   (Zitadel v4.16.1 pe Dokploy, DB dedicat, LE cert, OIDC discovery, PAT provisioner).

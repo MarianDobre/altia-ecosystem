@@ -45,22 +45,28 @@ rețea: `ZITADEL_INTERNAL_URL=http://zitadel:8080` (altfel tot `localhost:8082`)
 `compose/idp/docker-compose.yml` în acest repo și îl scoatem din compose-ul Facturare.
 Portul 8082 rămâne canonic ca să nu se schimbe nicio configurare de aplicație.
 
-## Staging — `id.test.companero.ro` (instanță separată)
+## Staging — `id.test.companero.ro` (instanță separată; LIVE din 2026-07-18)
 
 **Da, ai nevoie de el.** OIDC-ul are redirect-uri de browser cu domenii fixe per client —
 nu poți loga pe `test.companero.ro` (sau pe staging-urile CRM/Facturare) prin IdP-ul de
 prod fără să amesteci userii și redirect URI-urile de test cu cele reale.
 
-- Proiect Dokploy separat pe Hetzner: `zitadel` + `postgres:17` dedicat (NU partajat cu
-  prod și NU cu PG-ul altui produs).
-- DNS Cloudflare `id.test.companero.ro`. Poate sta **după Cloudflare Access**, la fel ca
-  `test.companero.ro` — e chiar de dorit (staging privat): omul trece o singură dată de
-  Access, apoi redirect-urile OIDC funcționează normal în browser. Backchannel-ul
-  aplicațiilor (token/introspection/JWKS) folosește `ZITADEL_INTERNAL_URL` pe rețeaua
-  Docker internă (`http://<serviciu-zitadel-staging>:8080`), deci nu atinge Cloudflare.
+- Implementat: proiect Dokploy **`Companero.test.id`** — `zitadel-db` (postgres:18,
+  Database service) + compose `zitadel` (serviciul se numește `zitadel-test` ca să nu
+  coliziuneze aliasul DNS cu prod pe dokploy-network). Compose versionat:
+  `compose/idp/docker-compose.test.yml`.
+- **DNS Cloudflare: A record `id.test` → 88.99.96.16, DNS only (nor GRI, nu proxied!).**
+  ⚠️ Corecție față de planul inițial („poate sta după Cloudflare Access"): Universal SSL
+  acoperă doar `companero.ro` + `*.companero.ro` (UN nivel). `id.test.companero.ro` are
+  două niveluri → proxied ar da eroare de certificat la edge (fără Advanced Certificate
+  Manager), iar Access cere proxy — deci fără Access aici. Gri = TLS direct pe Traefik
+  cu Let's Encrypt (emis automat când există DNS-ul public). Notat și în memoria de
+  infra: domeniile Dokploy-Traefik merg gri.
 - Config Zitadel: `ZITADEL_EXTERNALDOMAIN=id.test.companero.ro`, `ZITADEL_EXTERNALSECURE=true`,
-  TLS terminat de Cloudflare/Traefik (tlsMode external).
-- Useri de test separați de prod; bootstrap cu același script, parametrizat pe domeniu.
+  `ZITADEL_TLS_ENABLED=false`, `--masterkeyFromEnv --tlsMode external`.
+- Useri de test separați de prod; bootstrap-ul de clienți OIDC cu același script,
+  parametrizat pe domeniu. Masterkey staging: copie locală în
+  `~/.secrets/zitadel-test-masterkey` pe Mac-ul lui Marian (+ Dokploy Environment).
 
 ## Prod — `id.companero.ro`
 

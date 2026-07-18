@@ -1,0 +1,65 @@
+# Companero ID — STAGING (id.test.companero.ro), proiect Dokploy „Companero.test.id"
+# Deployat prin API 2026-07-18. Diferențe față de prod: serviciu `zitadel-test` (evită
+# coliziunea de alias DNS cu prod pe dokploy-network), volum machinekey EXTERN pre-creat
+# cu permisiuni corecte (capcana #5), domeniu id.test.companero.ro (DNS Cloudflare GRI —
+# vezi docs/medii-zitadel.md). Env în Dokploy: aceleași chei ca prod + PAT_EXPIRATION.
+
+services:
+  zitadel-test:
+    image: ghcr.io/zitadel/zitadel:${ZITADEL_VERSION}
+    restart: unless-stopped
+    command: start-from-init --masterkeyFromEnv --tlsMode external
+    environment:
+      ZITADEL_MASTERKEY: ${ZITADEL_MASTERKEY}
+      ZITADEL_DATABASE_POSTGRES_HOST: ${PG_HOST}
+      ZITADEL_DATABASE_POSTGRES_PORT: '5432'
+      ZITADEL_DATABASE_POSTGRES_DATABASE: zitadel
+      ZITADEL_DATABASE_POSTGRES_USER_USERNAME: zitadel
+      ZITADEL_DATABASE_POSTGRES_USER_PASSWORD: ${PG_PASSWORD}
+      ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE: disable
+      ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME: zitadel
+      ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD: ${PG_PASSWORD}
+      ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE: disable
+      ZITADEL_EXTERNALSECURE: 'true'
+      ZITADEL_TLS_ENABLED: 'false'
+      ZITADEL_EXTERNALDOMAIN: id.test.companero.ro
+      ZITADEL_EXTERNALPORT: '443'
+      ZITADEL_FIRSTINSTANCE_ORG_NAME: Companero
+      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME: ${ADMIN_USERNAME}
+      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD: ${ADMIN_PASSWORD}
+      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_EMAIL_ADDRESS: ${ADMIN_EMAIL}
+      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_EMAIL_VERIFIED: 'true'
+      ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_USERNAME: provisioner
+      ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_NAME: Provisioner
+      ZITADEL_FIRSTINSTANCE_PATPATH: /machinekey/pat.txt
+      ZITADEL_FIRSTINSTANCE_ORG_MACHINE_PAT_EXPIRATIONDATE: ${PAT_EXPIRATION}
+    volumes:
+      - zitadel_machinekey:/machinekey
+    networks:
+      - dokploy-network
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=dokploy-network
+      - traefik.http.routers.companero-id-test.rule=Host(`id.test.companero.ro`)
+      - traefik.http.routers.companero-id-test.entrypoints=websecure
+      - traefik.http.routers.companero-id-test.tls=true
+      - traefik.http.routers.companero-id-test.tls.certresolver=letsencrypt
+      - traefik.http.routers.companero-id-test.service=companero-id-test
+      - traefik.http.services.companero-id-test.loadbalancer.server.port=8080
+      - traefik.http.routers.companero-id-test-web.rule=Host(`id.test.companero.ro`)
+      - traefik.http.routers.companero-id-test-web.entrypoints=web
+      - traefik.http.routers.companero-id-test-web.service=companero-id-test
+    healthcheck:
+      test: ['CMD', '/app/zitadel', 'ready']
+      interval: 15s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  zitadel_machinekey:
+    external: true
+    name: companero-test-id-zitadel-mk
+
+networks:
+  dokploy-network:
+    external: true
