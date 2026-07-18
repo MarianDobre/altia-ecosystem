@@ -81,6 +81,18 @@ iasă din prima. Compose-ul din acest director le are deja pe toate încorporate
    (`ZITADEL_TLS_ENABLED=false`) — flag-urile comenzii de start NU ajung la probe.
    Container never-healthy = Traefik nu rutează (404 cu cert default).
 
+8. **Login V2 activ implicit în v4** → primul login în consolă redirecționează spre
+   `/ui/v2/login/...` care dă `{"code":5,"message":"Not Found"}` — noul login e o
+   APLICAȚIE SEPARATĂ (container `zitadel-login`) pe care n-o rulăm. Fix (post-boot,
+   cu PAT-ul provisionerului din volumul machinekey):
+   ```bash
+   curl -H "Authorization: Bearer $PAT" -H "Content-Type: application/json" \
+     -X PUT https://id.companero.ro/v2/features/instance -d '{"loginV2":{"required":false}}'
+   ```
+   (identic cu ce face `companero.facturare/scripts/zitadel-bootstrap.sh` local).
+   Aplicat pe prod 2026-07-18 (HTTP 200). Dacă vrem vreodată UI-ul de login nou,
+   deployăm containerul `zitadel-login` și re-activăm feature-ul.
+
 Plus: **Dokploy nu injectează label-uri Traefik pentru Compose Raw** — tab-ul Domains e
 inert aici; rutarea se face DOAR prin `traefik.*` labels scrise de noi în compose
 (provider-ul Docker e activ, `exposedByDefault: false`). Deploy-urile „Done/verzi" în
