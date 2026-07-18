@@ -105,12 +105,23 @@ tenancy rămâne locală per produs, legată prin `oidc_sub`; S2S rămâne pe AP
       Compose Raw).
     - Rămase pt A2/M2-real: client OIDC (bootstrap cu PAT), `S3_*` (bucket R2 — de la
       Marian), `ANAF_*` real, Netopia real. Backup R2 pe facturare-db → B4.
-- [ ] **A3. Bizigniter pe OIDC nativ** — ⚠️ obligatoriu ÎNAINTE de submisia App Store.
-  - `expo-auth-session` PKCE în `apps/mobile`; echivalent în `apps/web`.
-  - API-ul validează JWT Zitadel (JWKS) în loc de JWT propriu emis din parola Companero.
-  - Se elimină stocarea `companeroToken`/`companeroRefreshToken` din tabela User.
-  - Tranzitoriu (până la A5): apelurile spre Companero se fac cu API key de serviciu, server-side.
-  - Linking useri beta pe email la primul login cu Companero ID.
+- [x] **A3. Bizigniter pe OIDC nativ** — **LIVE PE PROD 2026-07-18** ✅ (agent Opus +
+  review; commit `b12ef33`, autodeploy, migrarea aplicată la boot). Verificat:
+  `/auth/login` 404 (dispărut), `/auth/me` 401 fără token (guard JWKS activ), butonul pe
+  bizigniter.app/login. Anti-pattern-ul password-sharing ELIMINAT complet.
+  - Clienți OIDC (proiect Zitadel `bizigniter`): mobil `382327214865121282` (NATIVE,
+    `bizigniter://auth`, JWT), web `382327215150333954` (USER_AGENT, `/auth/callback`,
+    JWT). eas.json are valorile pe preview/production → următorul build EAS iese cu
+    Companero ID.
+  - Cheie de serviciu Companero emisă pe Netcup (`app:api-key:issue`, tier business,
+    scope read, user marian) → `COMPANERO_API_KEY` în env bizigniter-api. `JWT_SECRET`/
+    `JWT_EXPIRES_IN` scoase din env.
+  - **Follow-up-uri**: (1) verificare `audience` în ZitadelAuthGuard (azi acceptă orice
+    token al instanței — toți clienții sunt ai noștri, risc mic); (2) REVOCĂ cheia cmpk
+    orfană `bizigniter-service` emisă prima (plaintext pierdut înainte de instalare —
+    două chei cu același nume există; de curățat pe Netcup); (3) test uman: login pe
+    bizigniter.app + build EAS pentru mobil; (4) tier `internal` pe cheie dacă beta
+    lovește rate-limit-ul business.
 - [x] **A4. CRM pe Companero ID** — **COD COMPLET 2026-07-18** ✅ (agent Opus, comis
   `f56c7d9` + push): genericOAuth PKCE opt-in pe `COMPANERO_ID_*` (nesetate ⇒ identic cu
   azi), linking pe email DOAR cu email local verificat (gardă anti-takeover verificată în
