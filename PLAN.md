@@ -44,8 +44,8 @@ tenancy rămâne locală per produs, legată prin `oidc_sub`; S2S rămâne pe AP
     deploy (secțiunea „Capcanele primului deploy" din README — citește-o înainte de A1b!).
   - Login + parolă nouă + MFA făcute de Marian ✔. **SMTP Brevo funcțional** (2026-07-18,
     verificat cu email real; capcanele 9–11 în runbook — Hetzner blochează 465, semantica
-    `tls`, bug-ul endpoint-ului de password). Rămas: branding „Companero ID" + register
-    public off (consolă) + **rotația PAT-ului provisioner** (a ajuns într-un transcript
+    `tls`, bug-ul endpoint-ului de password). Register public OFF pe AMBELE instanțe (2026-07-18, via API) ✔.
+    Rămas: branding „Companero ID" (consolă) + **rotația PAT-ului provisioner** (a ajuns într-un transcript
     local — vezi nota din runbook).
   - **Rămas ops:** verificat/configurat backup-ul R2 al serviciului `zitadel-db` din
     tab-ul Backups (pasul 2 din runbook); Cloudflare zonă → Full (strict) acum că
@@ -98,9 +98,13 @@ Ordine obligatorie: A1 → (A2, A3, A4, A7); A5 → A6. A3 are deadline natural 
   Datero (multi-stage node:22-alpine, non-root, healthcheck `/health`).
 - [ ] **B3. Observabilitate comună** — uptime-kuma pe Dokploy (toate `/health`-urile,
   alerte în Slack-ul existent Companero) + Sentry (DSN per proiect; întâi Bizigniter + Facturare).
-- [ ] **B4. Backups standard** — script pgdump→R2 parametrizat, ca serviciu în fiecare
-  stack Dokploy: Zitadel (odată cu A1!), Datero, Bizigniter, apoi CRM/Facturare la deploy.
-  Model: backup-ul R2 existent al Companero core (vezi memoria/deploy-ul core).
+- [ ] **B4. Backups standard — TOATE proiectele Dokploy** (cerut explicit de Marian
+  2026-07-18, „nu am timp acum" — de programat o sesiune dedicată). Preferabil prin
+  tab-ul Backups al serviciilor Database Dokploy (S3→R2, nativ) unde există serviciu
+  Database; script pgdump→R2 doar unde DB-ul e în compose. De acoperit: `zitadel-db`
+  (prod **prioritar** + staging), `datero-postgres`, `bizigniter-db`, PG-ul companero-ai
+  (feature store, în compose), apoi CRM/Facturare la deploy. Verificat și restore-ul, nu
+  doar dump-ul. Model: backup-ul R2 al Companero core.
 - [ ] **B5. CI uniform** — pipeline-ul Facturare (Biome→typecheck→Vitest→migrări+RLS)
   replicat în CRM, Bizigniter, Datero unde lipsește.
 
