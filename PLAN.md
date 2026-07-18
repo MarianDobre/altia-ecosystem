@@ -6,7 +6,7 @@
 > curent. La finalul fiecărei sesiuni de lucru: bifează pașii finalizați, adaugă o intrare
 > în **Jurnalul de progres** (jos) și commit în acest repo.
 
-**Ultima actualizare:** 2026-07-18 (sesiune Fable — analiză + decizii + B1/C1/C2)
+**Ultima actualizare:** 2026-07-18 (sesiune Fable, runda 3 — A2/A4/A7 live, CRM deployat, SSO confirmat pe toate trei)
 
 ---
 
@@ -116,9 +116,18 @@ tenancy rămâne locală per produs, legată prin `oidc_sub`; S2S rămâne pe AP
   azi), linking pe email DOAR cu email local verificat (gardă anti-takeover verificată în
   sursa better-auth), buton pe login/signup cu flag server-side request-time, docs
   ARCHITECTURE §10.1–10.2 corectate (planul „Companero ca IdP" SUPERSEDED → ADR-001).
-  Loop verde: typecheck/lint/test 40-40/build/e2e 6-6. **Rămas la deploy-ul CRM:** client
-  OIDC per mediu (redirect `${BETTER_AUTH_URL}/api/auth/oauth2/callback/companero-id`)
-  + env-urile în Dokploy.
+  Loop verde: typecheck/lint/test 40-40/build/e2e 6-6.
+  - **CRM DEPLOYAT PE PROD + SSO CONFIRMAT DE MARIAN (2026-07-18)** ✅:
+    **https://crm.companero.ro** live — aplicație Dokploy `crm` în proiectul
+    `Companero.crm` (GitHub MarianDobre/crm, autodeploy ON, Dockerfile single-target),
+    domeniu + LE. Client OIDC `crm-web-login` pe id.companero.ro (proiect Zitadel `crm`,
+    auth POST, redirect /api/auth/oauth2/callback/companero-id). Env: DSN owner (migrații)
+    + `crm_app` (runtime RLS) + BETTER_AUTH_* + COMPANERO_ID_*.
+    Migrațiile rulate one-off din stage-ul `build` al imaginii
+    (`docker build --target build` din codul deployat + `pnpm db:migrate` pe
+    dokploy-network — pattern reutilizabil; runner-ul provizionează și rolul crm_app).
+    Capcană notată: între deploy și migrații, SSO-ul dă „Autentificarea a eșuat"
+    (better-auth fără tabele) — la orice mediu nou: migrațiile ÎNAINTE de primul login.
 - [ ] **A5. Companero core ca relying party** (legacy touch, chirurgical; „când va fi cazul")
   - Symfony OIDC access-token handler: `/api/v1` acceptă și JWT Zitadel (JWKS), în paralel cu Lexik.
   - Buton „Intră cu Companero ID" pe web; linking pe email verificat + stamp `oidc_sub` pe `app_user`.
