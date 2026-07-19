@@ -49,3 +49,17 @@ Dacă schimbi pragurile: editezi scriptul pe server (token-urile push sunt în e
   reconstrucție, nu failover. (Failover-ul real = alt server + restore, câteva ore.)
 - Netdata/dashboard-uri de metrici: opțional, dacă alertele nu ajung.
 - Backup-ul stării Dokploy NU salvează imaginile Docker (by design).
+
+## Istoric operațiuni
+
+- **2026-07-19**: update Dokploy (digest dfcce8→2f7c27) cu backup de stare imediat
+  înainte; procedura sigură: `~/bin/dokploy-state-backup.sh` → `docker service update
+  --image dokploy/dokploy:latest dokploy` → verificare panel 200 + API + digest.
+  Doar panel-ul repornește (~30s); aplicațiile/Traefik neatinse.
+- **2026-07-19, inventar disk** (269/436 GB): volume 184 GB — top: ⚠️ `companero-app…_
+  mysql_data` **105 GB** (MySQL DEZAFECTAT la consolidarea PG — greutate moartă pe
+  standby; decizie Marian în așteptare: arhivare în R2 + ștergere ar elibera ~24% din
+  disk), PG test 31 GB, arhive Mongo 2×18 GB; overlay2 111 GB (imagini+layere containere).
+- **2026-07-19, memorie**: căderea din graficul Dokploy (~33→11 GiB) = curățenia Docker
+  de la 06:20 (page cache evacuat la ștergerea imaginilor) — benignă, tot ce e monitorizat
+  a rămas UP.
