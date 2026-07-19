@@ -212,13 +212,16 @@ Ordine obligatorie: A1 → (A2, A3, A4, A7); A5 → A6. A3 are deadline natural 
   prima accesare (pagina de setup e publică până atunci — fă-o repede!); (2) adăugarea
   monitoarelor (/health-urile: facturare web+api via domeniu, datero, bizigniter, id +
   id.test /debug/healthz, companero.ro) + notificare Slack; (3) Sentry (DSN per proiect).
-- [ ] **B4. Backups standard — TOATE proiectele Dokploy** (cerut explicit de Marian
-  2026-07-18, „nu am timp acum" — de programat o sesiune dedicată). Preferabil prin
-  tab-ul Backups al serviciilor Database Dokploy (S3→R2, nativ) unde există serviciu
-  Database; script pgdump→R2 doar unde DB-ul e în compose. De acoperit: `zitadel-db`
-  (prod **prioritar** + staging), `datero-postgres`, `bizigniter-db`, PG-ul companero-ai
-  (feature store, în compose), apoi CRM/Facturare la deploy. Verificat și restore-ul, nu
-  doar dump-ul. Model: backup-ul R2 al Companero core.
+- [x] **B4. Backup-uri PROD — FĂCUT + VERIFICAT 2026-07-19** ✅ (aprobat de Marian,
+  token R2 dedicat de la el): backup nativ Dokploy zilnic (03:10–03:50 UTC, retenție 14)
+  pe cele 5 baze de prod: zitadel-db, facturare-db, crm-db, datero-postgres,
+  bizigniter-db → bucket `companero`, prefix `<appName>/dokploy-backups/<nume>/`
+  (backup-ul core `backup/` neatins). Verificat cap-coadă: backup manual pe toate 5 +
+  obiecte în R2 + **test de restore REAL** (crm: pg_restore 0 erori, 18 tabele, 13
+  politici RLS). Capcane documentate în **`docs/backups.md`**: formatul e pg_dump
+  CUSTOM deși extensia e .sql.gz (restore cu pg_restore!), baza bizigniter se numește
+  `bizigniter-db`. Excluse motivat: staging-uri, companero-ai (regenerabil), core
+  (mecanism propriu).
 - [ ] **B5. CI uniform** — pipeline-ul Facturare (Biome→typecheck→Vitest→migrări+RLS)
   replicat în CRM, Bizigniter, Datero unde lipsește.
 
