@@ -226,6 +226,15 @@ Ordine obligatorie: A1 → (A2, A3, A4, A7); A5 → A6. A3 are deadline natural 
 - [ ] **B5. CI uniform** — pipeline-ul Facturare (Biome→typecheck→Vitest→migrări+RLS)
   replicat în CRM, Bizigniter, Datero unde lipsește.
 
+- [x] **B6. Reziliența serverului Hetzner** (cerut de Marian 2026-07-19, aprobat integral,
+  FĂCUT + VERIFICAT în aceeași zi) — vezi **`docs/server-hetzner.md`**:
+  (1) backup zilnic al STĂRII DOKPLOY (DB panel cu toate env-urile/secretele +
+  /etc/dokploy + volumele mici critice) → `s3://backups/dokploy-panel/`, retenție 14,
+  verificat cu download+pg_restore --list; (2) curățenie Docker zilnică (image prune
+  >72h + builder cache cap 10GB — prima rulare a recuperat ~19GB); (3) monitorizare
+  server prin heartbeat inversat în uptime-kuma (disk <85%, load, RAM — toate UP).
+  Limită asumată: hardware-ul rămâne SPOF; backup = reconstrucție, nu failover.
+
 ## Flux C — Contract & context agenți
 
 - [x] **C1. `docs/CONTEXT.md` per proiect** (2026-07-18) — „cartea de vizită" de ~2 pagini
