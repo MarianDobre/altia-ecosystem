@@ -5,17 +5,19 @@ upload R2 + retenție; vizibil per serviciu în tab-ul Backups).
 
 ## Organizare în R2
 
-- Bucket: **`companero`** (cel existent). Backup-ul core-ului (`backup/`, făcut de
-  scripturile proprii companero.ro) e NEATINS.
-- Destinație Dokploy: `r2-dokploy-backups` (token R2 dedicat, salvat local în
-  `~/.secrets/r2-dokploy` pe Mac-ul lui Marian; separat de tokenul core-ului).
+- Bucket: **`backups`** (DEDICAT, creat de Marian 2026-07-19; token R2 scoped DOAR pe
+  el — `~/.secrets/r2-dokploy` pe Mac). Bucketul `companero` NU mai e folosit pentru
+  backup-urile Dokploy (varianta inițială de acolo a fost curățată — DOAR obiectele de
+  test create în aceeași zi; `backup/`-ul core, neatins, rămâne mecanismul propriu al
+  companero.ro în bucketul `companero`).
+- Destinație Dokploy: `r2-dokploy-backups` → bucket `backups`.
 - **⚠️ Layout real**: Dokploy prefixează cu appName-ul serviciului:
-  `<appName>/dokploy-backups/<nume>/<timestamp>.sql.gz`. Exemple:
-  - `companeroid-zitadeldb-2ygqbc/dokploy-backups/zitadel-prod/…`
-  - `postgres-input-neural-program-mlostx/dokploy-backups/facturare-prod/…`
-  - `postgres-calculate-mobile-hard-drive-maijea/dokploy-backups/crm-prod/…`
-  - `datero-postgres-vfqhal/dokploy-backups/datero-prod/…`
-  - `bizigniter-db-r4ks2v/dokploy-backups/bizigniter-prod/…`
+  `<appName>/<nume>/<timestamp>.sql.gz`:
+  - `companeroid-zitadeldb-2ygqbc/zitadel-prod/…`
+  - `postgres-input-neural-program-mlostx/facturare-prod/…`
+  - `postgres-calculate-mobile-hard-drive-maijea/crm-prod/…`
+  - `datero-postgres-vfqhal/datero-prod/…`
+  - `bizigniter-db-r4ks2v/bizigniter-prod/…`
 - **⚠️ Formatul e pg_dump CUSTOM (header `PGDMP`), deși extensia e `.sql.gz`** —
   restore cu `pg_restore`, NU cu psql!
 
@@ -34,7 +36,8 @@ reconstruit săptămânal din build), core-ul (mecanism propriu existent).
 
 ## Verificat la configurare (2026-07-19)
 
-- Backup manual declanșat pe toate 5 → obiecte confirmate în R2 (10–112 KB gz).
+- Backup manual declanșat pe toate 5 → obiecte confirmate în bucketul `backups`
+  (10–112 KB gz; re-rulat după mutarea pe bucketul dedicat).
 - **Test de restore REAL** pe dump-ul crm: `pg_restore --no-owner` într-un postgres:17
   descartabil (cu rolurile `crm`/`crm_app` create întâi) → 0 erori, 18 tabele,
   datele prezente, 13 politici RLS restaurate.
