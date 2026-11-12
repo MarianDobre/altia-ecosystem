@@ -7,6 +7,18 @@ credențiale local pe Mac în `~/.secrets/uptime-kuma`). **CONFIGURAT 2026-07-18
 **Brevo → marian.dobre@gmail.com** setată default pe toate (Slack: de adăugat când
 există un incoming webhook — bot-token-ul core nu e compatibil cu uptime-kuma).
 
+**Versiune: 2.5.11 (din 2026-11-12; înainte `louislam/uptime-kuma:1` = 1.23.17, linie fără
+patch-uri).** Aplicația Dokploy `uptime-kuma` (serviciul swarm `app-calculate-virtual-feed-zbqmey`,
+sursă *docker*, volum `uptime-kuma-data` → `/app/data`), imagine fixată pe tag exact. Upgrade
+1→2: repetiție pe o copie a volumului (`--network none`, ca să nu plece notificări), apoi
+serviciul scalat la 0, backup, imaginea schimbată în DB-ul Dokploy (`application.dockerImage`)
+și în serviciu; migrarea agregatelor a durat ~3,5 min (322 MB de date). Backup v1:
+`/home/altia/pre-kuma-v2-20261112/` pe Hetzner. **Atenție:** serviciul are `UpdateConfig.Order
+= start-first`, deci la un redeploy Dokploy două instanțe ating scurt același `kuma.db`
+(SQLite); la un upgrade de versiune oprește întâi serviciul (scale 0). Notificarea email nu are
+template personalizat, deci trecerea v2 la LiquidJS nu o afectează. La un upgrade viitor:
+tag nou în Dokploy (Docker image) + Deploy; citește întâi release notes.
+
 ## Monitoarele configurate (live)
 
 | Nume | URL | Așteptat |
