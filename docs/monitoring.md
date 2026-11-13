@@ -13,9 +13,10 @@ sursă *docker*, volum `uptime-kuma-data` → `/app/data`), imagine fixată pe t
 1→2: repetiție pe o copie a volumului (`--network none`, ca să nu plece notificări), apoi
 serviciul scalat la 0, backup, imaginea schimbată în DB-ul Dokploy (`application.dockerImage`)
 și în serviciu; migrarea agregatelor a durat ~3,5 min (322 MB de date). Backup v1:
-`/home/altia/pre-kuma-v2-20261112/` pe Hetzner. **Atenție:** serviciul are `UpdateConfig.Order
-= start-first`, deci la un redeploy Dokploy două instanțe ating scurt același `kuma.db`
-(SQLite); la un upgrade de versiune oprește întâi serviciul (scale 0). Notificarea email nu are
+`/home/altia/pre-kuma-v2-20261112/` pe Hetzner. **Update order = `stop-first` (din 2026-11-13)**,
+setat în DB-ul Dokploy (`application.updateConfigSwarm`, înainte NULL = implicitul Dokploy
+`start-first`) și pe serviciu: la redeploy nu mai pornesc două instanțe pe același `kuma.db`
+(SQLite); costul e o întrerupere de câteva secunde. La un upgrade major, tot backup întâi. Notificarea email nu are
 template personalizat, deci trecerea v2 la LiquidJS nu o afectează. La un upgrade viitor:
 tag nou în Dokploy (Docker image) + Deploy; citește întâi release notes.
 
