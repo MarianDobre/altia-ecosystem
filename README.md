@@ -19,6 +19,7 @@ local cross-proiect. **Nu conține cod de produs.**
 |---|---|---|---|
 | Companero (core) | `~/docker/altia/docker-companies/src/companies` | Platforma principală (Symfony 7.4, PG17, ES) | Netcup (prod) + Hetzner (staging) |
 | Companero AI | `~/docker/altia/companero-ai` | Motor recomandări (FastAPI, pgvector) | Dokploy/Hetzner |
+| Companero Crawler | `~/docker/altia/companero-crawler` | Crawler de site-uri de firme (propunere, fără cod — `docs/PROPOSAL.md`) | Dokploy/Hetzner (viitor) |
 | Companero Mobile | `~/docker/altia/companero-mobile` | App mobilă Companero (Expo/RN) | EAS (viitor) |
 | Companero CRM | `~/docker/altia/companero.crm` | CRM multi-tenant (Next 15, tRPC, Drizzle, RLS) | Dokploy (viitor) |
 | Companero Facturare | `~/docker/altia/companero.facturare` | Facturare SaaS (NestJS, Next, Drizzle, RLS, Zitadel) | Dokploy (viitor) |
