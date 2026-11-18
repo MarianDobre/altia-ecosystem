@@ -24,7 +24,7 @@ local cross-proiect. **Nu conține cod de produs.**
 | Companero CRM | `~/docker/altia/companero.crm` | CRM multi-tenant (Next 15, tRPC, Drizzle, RLS) | Dokploy (viitor) |
 | Companero Facturare | `~/docker/altia/companero.facturare` | Facturare SaaS (NestJS, Next, Drizzle, RLS, Zitadel) | Dokploy (viitor) |
 | Datero | `~/docker/altia/datero` | API pentru dezvoltatori (Fastify, better-auth, Stripe) | Dokploy (live) |
-| Fondurieuropene | `~/docker/altia/fondurieuropene.net` | Registru de finanțări nerambursabile + eligibilitate pe CUI prin Companero (Astro 7 SSR; API Fastify din Etapa 2) | Dokploy (Hetzner) |
+| Fondurieuropene | `~/docker/altia/fondurieuropene.net` | Registru de finanțări nerambursabile + eligibilitate pe CUI prin Companero (Astro 7 SSR; API Fastify din Etapa 2) | Dokploy (live, fondurieuropene.net) |
 | Bizigniter | `~/docker/altia/bizigniter` | Prospectare/vânzări, mobil (Expo + NestJS + Prisma) | Dokploy + EAS |
 | Ansible | `~/docker/altia/ansible_automation` | Provisioning/deploy Companero core (Netcup) | — |
 

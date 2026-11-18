@@ -269,6 +269,18 @@ Ordine obligatorie: A1 → (A2, A3, A4, A7); A5 → A6. A3 are deadline natural 
 
 ## Jurnalul de progres
 
+- **2026-11-18 (Opus 5.5) — fondurieuropene.net, Etapa 1 LIVE.** Produs nou ALTIA (registru de
+  finanțări nerambursabile + eligibilitate pe CUI prin Companero). Repo privat
+  `MarianDobre/fondurieuropene.net` (monorepo pnpm, Astro 7 SSR, CI verde). Dokploy: proiect
+  `Fondurieuropene`, aplicația `web` (port 3003), autodeploy prin deploy key SSH + webhook GitHub
+  pe `/api/deploy/*` (exceptat din Access) — **fără GitHub App**. Cloudflare (din dashboard):
+  A apex + www proxied, Full (strict), Always HTTPS, redirect www→apex 301, Bot Fight Mode și
+  blocarea AI oprite; HSTS lăsat oprit deocamdată. Monitor Kuma #16 UP. Porturi rezervate
+  (3003/4003/5439/6382) + MCP legislatie 4002 înregistrat. Observații: (1) legislatie.info are
+  deploy key, dar niciun webhook pe GitHub → autodeploy-ul lui probabil nu se declanșează la push;
+  (2) `uptime-kuma-api` 1.x nu mai poate `add_monitor` pe Kuma 2.5 (soluția: evenimentul socket
+  `add`, detalii în `fondurieuropene.net/docs/DEPLOY.md`). Detalii: `fondurieuropene.net/docs/`.
+
 - **2026-07-18 (Fable, runda 5) — A5 ÎN PROD (dezactivat) + incident scurt.** La cererea
   lui Marian, A5 comis pe main (`fa432f0`) și deployat pe Netcup prin Ansible, cu
   feature-ul stins (env-urile goale). **Incident ~15 min**: placeholder-ele goale din
