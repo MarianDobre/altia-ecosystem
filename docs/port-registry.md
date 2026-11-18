@@ -14,16 +14,21 @@ acum au fost alese ad-hoc și au început să se aglomereze.
 | 3000 | bizigniter | web (Next dev) ⚠️ conflict cu facturare — nu rula ambele simultan |
 | 3001 | facturare | api (NestJS) |
 | 3002 | legislatie.info | web (Astro SSR) |
+| 3003 | fondurieuropene.net | web (Astro SSR) |
 | 3005 | facturare | Gotenberg |
 | 4000 | bizigniter | api (NestJS) |
 | 4001 | legislatie.info | API (Fastify) |
+| 4002 | legislatie.info | MCP (găsit în `docker-compose.yml`, nerezervat până la 18.11) |
+| 4003 | fondurieuropene.net | API (Fastify, rezervat — Etapa 2) |
 | 4321 | datero | web (Astro dev) |
 | 5434 | bizigniter | PostgreSQL 16 |
 | 5435 | companero.crm | PostgreSQL 17 |
 | 5436 | facturare | PostgreSQL 17 |
 | 5437 | legislatie.info | PostgreSQL 17 |
 | 5438 | companero-crawler | PostgreSQL 17 (rezervat, proiect în faza de propunere) |
+| 5439 | fondurieuropene.net | PostgreSQL 17 (rezervat — Etapa 2) |
 | 6381 | facturare | Redis |
+| 6382 | fondurieuropene.net | Redis (rezervat — Etapa 3) |
 | 8026 | facturare | Mailpit UI |
 | 8082 | **ecosistem (IdP)** | **Zitadel local partajat** — port canonic, nu se schimbă (azi găzduit de compose-ul Facturare; vezi `docs/medii-zitadel.md`) |
 | 8100 | companero-ai | FastAPI |
@@ -40,7 +45,7 @@ acum au fost alese ad-hoc și au început să se aglomereze.
 
 ## Convenție pentru viitor
 
-- PG-uri noi: continuă seria 543x (următorul liber: **5439**).
-- Redis noi: seria 638x (următorul liber: **6382**).
-- API-uri noi: seria 40xx (următorul liber: **4002**).
-- Web dev noi: evită 3000 (dublu ocupat); folosește 30xx (următorul liber: **3003**).
+- PG-uri noi: continuă seria 543x (următorul liber: **5440**).
+- Redis noi: seria 638x (următorul liber: **6383**).
+- API-uri noi: seria 40xx (următorul liber: **4004**).
+- Web dev noi: evită 3000 (dublu ocupat); folosește 30xx (următorul liber: **3004**).
