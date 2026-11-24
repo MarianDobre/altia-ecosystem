@@ -30,6 +30,7 @@ upload R2 + retenție; vizibil per serviciu în tab-ul Backups).
 | crm-db | 03:30 | `crm` |
 | datero-postgres | 03:40 | `datero` |
 | bizigniter-db | 03:50 | **`bizigniter-db`** (⚠️ numele bazei = numele serviciului, capcană descoperită la primul run) |
+| fondurieuropene-postgres | 04:00 | `fondurieuropene` (adăugat 2026-11-24; prefix `fondurieuropene-postgres-xslvlm/fondurieuropene-prod/`; restore testat: rânduri identice cu prod) |
 
 Excluse deliberat: staging-urile (regenerabile), PG-ul companero-ai (feature store
 reconstruit săptămânal din build), core-ul (mecanism propriu existent).
